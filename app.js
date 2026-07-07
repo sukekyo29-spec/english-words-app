@@ -154,6 +154,10 @@ const App = (() => {
     wordEl.textContent = q.word.en;
     wordEl.classList.toggle('long', q.word.en.length > 12);
     document.getElementById('word-hint').textContent = '';
+    const exEl = document.getElementById('word-example');
+    exEl.hidden = true;
+    exEl.innerHTML = '';
+    document.getElementById('next-btn').hidden = true;
 
     const pct = (currentIndex / questions.length) * 100;
     document.getElementById('progress-bar').style.width = pct + '%';
@@ -190,14 +194,32 @@ const App = (() => {
       wrongWords.push(q.word);
     }
 
-    setTimeout(() => {
-      currentIndex++;
-      if (currentIndex < questions.length) {
-        renderQuestion();
-      } else {
-        showResult();
-      }
-    }, 900);
+    // 例文表示
+    const ex = (typeof EXAMPLES !== 'undefined' && EXAMPLES[q.word.en]) || null;
+    if (ex) {
+      const exEl = document.getElementById('word-example');
+      exEl.innerHTML =
+        `<span class="example-en">🔊 ${ex[0]}</span><span class="example-ja">${ex[1]}</span>`;
+      exEl.dataset.text = ex[0];
+      exEl.hidden = false;
+    }
+
+    if (selectedIndex === q.correctIndex) {
+      // 正解: 例文があれば少し長めに表示してから自動で次へ
+      setTimeout(goNext, ex ? 2200 : 900);
+    } else {
+      // 不正解: 例文をじっくり読めるよう「次へ」を待つ
+      document.getElementById('next-btn').hidden = false;
+    }
+  }
+
+  function goNext() {
+    currentIndex++;
+    if (currentIndex < questions.length) {
+      renderQuestion();
+    } else {
+      showResult();
+    }
   }
 
   function showResult() {
@@ -259,16 +281,20 @@ const App = (() => {
       startBtn.disabled = true;
     } else {
       startBtn.disabled = false;
-      body.innerHTML = list.map(w => `
+      body.innerHTML = list.map(w => {
+        const ex = (typeof EXAMPLES !== 'undefined' && EXAMPLES[w.en]) || null;
+        return `
         <div class="review-list-item" data-en="${w.en}">
           <div class="review-item-words">
             <span class="review-item-en">${w.en}</span>
             <span class="review-item-ja">${w.ja}</span>
+            ${ex ? `<span class="review-item-ex">${ex[0]}</span>` : ''}
           </div>
           <button class="item-speak-btn" data-en="${w.en}" title="発音を聞く">🔊</button>
           <button class="remove-btn" data-en="${w.en}" title="リストから削除">✕</button>
         </div>
-      `).join('');
+      `;
+      }).join('');
 
       body.querySelectorAll('.item-speak-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -312,6 +338,11 @@ const App = (() => {
   document.getElementById('speak-btn').addEventListener('click', () => {
     if (questions[currentIndex]) speak(questions[currentIndex].word.en);
   });
+  document.getElementById('word-example').addEventListener('click', (e) => {
+    const text = e.currentTarget.dataset.text;
+    if (text) speak(text);
+  });
+  document.getElementById('next-btn').addEventListener('click', goNext);
   document.getElementById('word-english').addEventListener('click', () => {
     if (questions[currentIndex]) speak(questions[currentIndex].word.en);
   });

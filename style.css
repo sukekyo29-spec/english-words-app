@@ -5,6 +5,10 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 :root {
   --primary: #4F46E5;
   --primary-light: #6366F1;
@@ -299,6 +303,53 @@ html, body {
   color: var(--text-secondary);
   margin-top: 8px;
   min-height: 20px;
+}
+
+.word-example {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+  animation: fade-in 0.3s ease;
+}
+
+.example-en {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.example-ja {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.next-btn {
+  width: 100%;
+  padding: 16px;
+  border-radius: 18px;
+  border: none;
+  background: var(--primary);
+  color: white;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);
+  animation: fade-in 0.3s ease;
+}
+
+.next-btn:active {
+  transform: scale(0.97);
 }
 
 .choices-grid {
@@ -609,6 +660,13 @@ html, body {
 .review-item-ja {
   font-size: 13px;
   color: var(--text-secondary);
+}
+
+.review-item-ex {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-style: italic;
+  line-height: 1.4;
 }
 
 .item-speak-btn {
