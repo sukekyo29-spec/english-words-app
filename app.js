@@ -1,11 +1,42 @@
 const App = (() => {
   let questionCount = 20;
+  let category = localStorage.getItem('wordCategory') || 'words';
   let questions = [];
   let currentIndex = 0;
   let score = 0;
   let wrongWords = [];
   let answered = false;
   let isReviewMode = false;
+
+  // --- 読み上げ (Text-to-Speech) ---
+  let enVoice = null;
+  function pickVoice() {
+    const voices = speechSynthesis.getVoices();
+    enVoice =
+      voices.find(v => v.lang === 'en-US' && v.localService) ||
+      voices.find(v => v.lang === 'en-US') ||
+      voices.find(v => v.lang.startsWith('en')) ||
+      null;
+  }
+  if ('speechSynthesis' in window) {
+    pickVoice();
+    speechSynthesis.onvoiceschanged = pickVoice;
+  }
+  function speak(text) {
+    if (!('speechSynthesis' in window)) return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US';
+    if (enVoice) u.voice = enVoice;
+    u.rate = 0.9;
+    speechSynthesis.speak(u);
+  }
+
+  function activePool() {
+    if (category === 'phrases') return PHRASES;
+    if (category === 'mix') return WORDS.concat(PHRASES);
+    return WORDS;
+  }
 
   const screens = {
     home: document.getElementById('screen-home'),
@@ -77,11 +108,11 @@ const App = (() => {
     return arr;
   }
 
-  function buildQuestions(pool) {
+  function buildQuestions(pool, distractorPool) {
     const count = Math.min(questionCount, pool.length);
     const selected = shuffle([...pool]).slice(0, count);
     return selected.map(word => {
-      const wrong = shuffle(WORDS.filter(w => w.en !== word.en)).slice(0, 3);
+      const wrong = shuffle(distractorPool.filter(w => w.en !== word.en && w.ja !== word.ja)).slice(0, 3);
       const choices = shuffle([word, ...wrong]);
       return { word, choices, correctIndex: choices.indexOf(word) };
     });
@@ -89,7 +120,8 @@ const App = (() => {
 
   function startQuiz() {
     isReviewMode = false;
-    questions = buildQuestions(WORDS);
+    const pool = activePool();
+    questions = buildQuestions(pool, pool);
     currentIndex = 0;
     score = 0;
     wrongWords = [];
@@ -101,7 +133,7 @@ const App = (() => {
     const list = loadReviewList();
     if (list.length === 0) return;
     isReviewMode = true;
-    questions = buildQuestions(list);
+    questions = buildQuestions(list, WORDS.concat(PHRASES));
     currentIndex = 0;
     score = 0;
     wrongWords = [];
@@ -118,7 +150,9 @@ const App = (() => {
     document.getElementById('current-score').textContent = score;
     document.getElementById('word-number').textContent =
       (isReviewMode ? '🔁 復習 ' : '問題 ') + (currentIndex + 1);
-    document.getElementById('word-english').textContent = q.word.en;
+    const wordEl = document.getElementById('word-english');
+    wordEl.textContent = q.word.en;
+    wordEl.classList.toggle('long', q.word.en.length > 12);
     document.getElementById('word-hint').textContent = '';
 
     const pct = (currentIndex / questions.length) * 100;
@@ -130,6 +164,8 @@ const App = (() => {
       btn.className = 'choice-btn';
       btn.disabled = false;
     });
+
+    speak(q.word.en);
   }
 
   function handleAnswer(selectedIndex) {
@@ -229,9 +265,17 @@ const App = (() => {
             <span class="review-item-en">${w.en}</span>
             <span class="review-item-ja">${w.ja}</span>
           </div>
+          <button class="item-speak-btn" data-en="${w.en}" title="発音を聞く">🔊</button>
           <button class="remove-btn" data-en="${w.en}" title="リストから削除">✕</button>
         </div>
       `).join('');
+
+      body.querySelectorAll('.item-speak-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          speak(btn.dataset.en);
+        });
+      });
 
       body.querySelectorAll('.remove-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -248,12 +292,28 @@ const App = (() => {
   }
 
   // --- イベント ---
-  document.querySelectorAll('.mode-btn').forEach(btn => {
+  document.querySelectorAll('#count-buttons .mode-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('selected'));
+      document.querySelectorAll('#count-buttons .mode-btn').forEach(b => b.classList.remove('selected'));
       btn.classList.add('selected');
       questionCount = parseInt(btn.dataset.count);
     });
+  });
+
+  document.querySelectorAll('#cat-buttons .mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#cat-buttons .mode-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      category = btn.dataset.cat;
+      localStorage.setItem('wordCategory', category);
+    });
+  });
+
+  document.getElementById('speak-btn').addEventListener('click', () => {
+    if (questions[currentIndex]) speak(questions[currentIndex].word.en);
+  });
+  document.getElementById('word-english').addEventListener('click', () => {
+    if (questions[currentIndex]) speak(questions[currentIndex].word.en);
   });
 
   document.getElementById('start-btn').addEventListener('click', startQuiz);
@@ -309,6 +369,9 @@ const App = (() => {
   });
 
   // Init
+  document.querySelectorAll('#cat-buttons .mode-btn').forEach(b =>
+    b.classList.toggle('selected', b.dataset.cat === category)
+  );
   updateHomeStats();
   updateReviewBadge();
 })();

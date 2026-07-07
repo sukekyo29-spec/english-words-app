@@ -40,8 +40,17 @@
         </div>
 
         <div class="mode-section">
+          <h2 class="section-title">出題範囲</h2>
+          <div class="mode-buttons" id="cat-buttons">
+            <button class="mode-btn selected" data-cat="words">単語</button>
+            <button class="mode-btn" data-cat="phrases">熟語</button>
+            <button class="mode-btn" data-cat="mix">ミックス</button>
+          </div>
+        </div>
+
+        <div class="mode-section">
           <h2 class="section-title">問題数を選択</h2>
-          <div class="mode-buttons">
+          <div class="mode-buttons" id="count-buttons">
             <button class="mode-btn" data-count="10">10問</button>
             <button class="mode-btn selected" data-count="20">20問</button>
             <button class="mode-btn" data-count="50">50問</button>
@@ -81,6 +90,7 @@
         <div class="word-card">
           <div class="word-number" id="word-number">問題 1</div>
           <div class="word-english" id="word-english">word</div>
+          <button class="speak-btn" id="speak-btn" title="発音を聞く">🔊</button>
           <div class="word-hint" id="word-hint"></div>
         </div>
 
@@ -144,6 +154,7 @@
   </div>
 
   <script src="words.js"></script>
+  <script src="phrases.js"></script>
   <script src="app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {

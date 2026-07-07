@@ -1,10 +1,11 @@
-const CACHE = 'word-quiz-v2';
+const CACHE = 'word-quiz-v3';
 const FILES = [
   './',
   './index.html',
   './style.css',
   './app.js',
   './words.js',
+  './phrases.js',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
