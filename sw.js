@@ -1,4 +1,4 @@
-const CACHE = 'word-quiz-v3';
+const CACHE = 'word-quiz-v4';
 const FILES = [
   './',
   './index.html',
