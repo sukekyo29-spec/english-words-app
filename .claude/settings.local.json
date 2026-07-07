@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 generate_words2.py)",
+      "Bash(python3 generate_words3.py)",
+      "Bash(python3 generate_words4.py)",
+      "Bash(python3 generate_words5.py)",
+      "Bash(python3 -c ' *)",
+      "Bash(open \"/Users/kyosukemiyata/Desktop/English words app/index.html\")",
+      "Bash(ls /System/Library/Fonts/ | grep -i hiragino)",
+      "Bash(python3)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(rm -rf /tmp/word-quiz-preview)",
+      "Bash(mkdir -p /tmp/word-quiz-preview)",
+      "Bash(cp index.html style.css app.js words.js manifest.json sw.js icon-192.png icon-512.png apple-touch-icon.png /tmp/word-quiz-preview/)",
+      "Read(//tmp/**)",
+      "Bash(gh auth *)",
+      "Bash(git --version)",
+      "Bash(git credential *)"
+    ]
+  }
+}

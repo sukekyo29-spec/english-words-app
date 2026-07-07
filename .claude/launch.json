@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "word-quiz",
+      "runtimeExecutable": "/usr/bin/python3",
+      "runtimeArgs": ["/tmp/word-quiz-serve.py"],
+      "port": 3456
+    }
+  ]
+}

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#4F46E5">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="英単語テスト">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="manifest" href="manifest.json">
+  <title>英単語テスト</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+
+    <!-- ホーム画面 -->
+    <div id="screen-home" class="screen active">
+      <div class="home-content">
+        <div class="app-icon">📚</div>
+        <h1 class="app-title">英単語テスト</h1>
+        <p class="app-subtitle">3000 Most Common Words</p>
+
+        <div class="stats-card">
+          <div class="stat-item">
+            <span class="stat-value" id="total-answered">0</span>
+            <span class="stat-label">回答数</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-value" id="best-score">-</span>
+            <span class="stat-label">最高スコア</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-value" id="accuracy-rate">-</span>
+            <span class="stat-label">正答率</span>
+          </div>
+        </div>
+
+        <div class="mode-section">
+          <h2 class="section-title">問題数を選択</h2>
+          <div class="mode-buttons">
+            <button class="mode-btn" data-count="10">10問</button>
+            <button class="mode-btn selected" data-count="20">20問</button>
+            <button class="mode-btn" data-count="50">50問</button>
+          </div>
+        </div>
+
+        <button class="start-btn" id="start-btn">スタート</button>
+
+        <!-- 復習ボタン -->
+        <button class="review-btn" id="review-btn">
+          <span class="review-btn-icon">🔁</span>
+          <span>復習モード</span>
+          <span class="review-count-badge" id="review-count-badge">0</span>
+        </button>
+
+        <button class="reset-btn" id="reset-stats-btn">統計リセット</button>
+      </div>
+    </div>
+
+    <!-- クイズ画面 -->
+    <div id="screen-quiz" class="screen">
+      <div class="quiz-header">
+        <button class="back-btn" id="quiz-back-btn">✕</button>
+        <div class="progress-info">
+          <span id="question-counter">1 / 20</span>
+        </div>
+        <div class="score-badge">
+          <span id="current-score">0</span>点
+        </div>
+      </div>
+
+      <div class="progress-bar-wrap">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+
+      <div class="quiz-body">
+        <div class="word-card">
+          <div class="word-number" id="word-number">問題 1</div>
+          <div class="word-english" id="word-english">word</div>
+          <div class="word-hint" id="word-hint"></div>
+        </div>
+
+        <div class="choices-grid" id="choices-grid">
+          <button class="choice-btn" data-index="0"></button>
+          <button class="choice-btn" data-index="1"></button>
+          <button class="choice-btn" data-index="2"></button>
+          <button class="choice-btn" data-index="3"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 結果画面 -->
+    <div id="screen-result" class="screen">
+      <div class="result-content">
+        <div class="result-emoji" id="result-emoji">🎉</div>
+        <h2 class="result-title" id="result-title">お疲れ様でした！</h2>
+
+        <div class="result-score-card">
+          <div class="result-score-main">
+            <span id="result-score">0</span>
+            <span class="result-score-total" id="result-score-total">/ 20</span>
+          </div>
+          <div class="result-accuracy" id="result-accuracy">正答率 0%</div>
+        </div>
+
+        <div class="result-stats">
+          <div class="result-stat">
+            <span class="result-stat-icon">✅</span>
+            <span class="result-stat-label">正解</span>
+            <span class="result-stat-value" id="result-correct">0問</span>
+          </div>
+          <div class="result-stat">
+            <span class="result-stat-icon">❌</span>
+            <span class="result-stat-label">不正解</span>
+            <span class="result-stat-value" id="result-wrong">0問</span>
+          </div>
+        </div>
+
+        <!-- 今回の不正解 -->
+        <div class="result-wrong-list" id="result-wrong-list"></div>
+
+        <button class="start-btn" id="retry-btn">もう一度</button>
+        <button class="home-btn" id="home-btn">ホームへ</button>
+      </div>
+    </div>
+
+    <!-- 復習リスト画面 -->
+    <div id="screen-review-list" class="screen">
+      <div class="review-list-header">
+        <button class="back-btn" id="review-list-back-btn">←</button>
+        <h2 class="review-list-title">復習リスト</h2>
+        <button class="clear-btn" id="clear-review-btn">クリア</button>
+      </div>
+      <div class="review-list-body" id="review-list-body"></div>
+      <div class="review-list-footer">
+        <button class="start-btn" id="start-review-quiz-btn">この単語でテスト</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="words.js"></script>
+  <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js');
+    }
+  </script>
+</body>
+</html>
