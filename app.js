@@ -67,6 +67,14 @@ const App = (() => {
       stats.total ? Math.round(stats.correct / stats.total * 100) + '%' : '-';
   }
 
+  // --- 出題履歴(同じ単語が続けて出ないようにする) ---
+  function loadHistory() {
+    return JSON.parse(localStorage.getItem('wordHistory') || '{}');
+  }
+  function saveHistory(history) {
+    localStorage.setItem('wordHistory', JSON.stringify(history));
+  }
+
   // --- 復習リスト ---
   function loadReviewList() {
     return JSON.parse(localStorage.getItem('reviewList') || '[]');
@@ -108,9 +116,18 @@ const App = (() => {
     return arr;
   }
 
-  function buildQuestions(pool, distractorPool) {
+  function buildQuestions(pool, distractorPool, useHistory) {
     const count = Math.min(questionCount, pool.length);
-    const selected = shuffle([...pool]).slice(0, count);
+    const candidates = shuffle([...pool]);
+    if (useHistory) {
+      // 未出題を優先し、出題済みは古いものから選ぶ(全単語を一巡するまで再出題しない)
+      const history = loadHistory();
+      candidates.sort((a, b) => (history[a.en] || 0) - (history[b.en] || 0));
+      const now = Date.now();
+      candidates.slice(0, count).forEach(w => { history[w.en] = now; });
+      saveHistory(history);
+    }
+    const selected = candidates.slice(0, count);
     return selected.map(word => {
       const wrong = shuffle(distractorPool.filter(w => w.en !== word.en && w.ja !== word.ja)).slice(0, 3);
       const choices = shuffle([word, ...wrong]);
@@ -121,7 +138,7 @@ const App = (() => {
   function startQuiz() {
     isReviewMode = false;
     const pool = activePool();
-    questions = buildQuestions(pool, pool);
+    questions = buildQuestions(pool, pool, true);
     currentIndex = 0;
     score = 0;
     wrongWords = [];
